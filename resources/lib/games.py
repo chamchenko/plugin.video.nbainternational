@@ -552,7 +552,7 @@ def PLAY_GAME(plugin, title, gameID, start_time, game_state, ishomefeed=True,
             ql_url = baseurl + '/' + sample
             content = urlquick.get(ql_url, headers=headers, max_age=0).text
             durations = re.findall('\#EXTINF\:([0-9]+\.[0-9]+)\,', content)
-            duration = sum([float(i) for i in durations if type(i) == float or i.isdigit()])
+            duration = sum([float(i) for i in durations])
             start_point = str(duration - 120).split('.')[0]
     liz = Listitem()
     liz.path = url
