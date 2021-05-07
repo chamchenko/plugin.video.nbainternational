@@ -3,13 +3,18 @@
 # GNU General Public License v2.0+ (see LICENSE.txt or https://www.gnu.org/licenses/gpl-2.0.txt)
 # This file is part of plugin.video.nbainternational
 
+
 import urlquick
 
 from resources.lib.vars import *
 from resources.lib.tools import *
+from resources.lib.auth import get_headers
+from resources.lib.auth import get_device_ids
 from codequick import Route
 from codequick import Listitem
 from codequick import Resolver
+
+
 
 
 
@@ -116,6 +121,9 @@ def PLAY_EPISODE(plugin, episodeId, title):
     if not headers:
         yield False
         return
+    deviceinfos = get_device_ids()
+    DEVICEID = deviceinfos['PCID']
+    PCID = deviceinfos['PCID']
     payload_data = {
                         'type': 'video',
                         'id': episodeId,
@@ -131,19 +139,22 @@ def PLAY_EPISODE(plugin, episodeId, title):
                            ).json()
     url = Response['path']
     drm = Response['drmToken']
+    stream_type = Response['streamType']
+    if stream_type == 'dash':
+        protocol = 'mpd'
+    else:
+        protocol = 'hls'
     liz = Listitem()
     liz.label = title
     liz.path = url
-    for protocol, protocol_info in PROTOCOLS.items():
-        if any(".%s" % extension in url for extension in protocol_info['extensions']):
-            is_helper = Helper(protocol, drm=DRM)
-            if is_helper.check_inputstream():
-                liz.property[INPUTSTREAM_PROP] ='inputstream.adaptive'
-                liz.property['inputstream.adaptive.manifest_type'] = protocol
-                liz.property['inputstream.adaptive.license_type'] = DRM
-                license_key = '%s|authorization=bearer %s|R{SSM}|' % (LICENSE_URL, drm)
-                liz.property['inputstream.adaptive.license_key'] = license_key
-            else:
-                liz = False
-    yield liz
-    return
+    is_helper = Helper(protocol, drm=DRM)
+    if is_helper.check_inputstream():
+        liz.property[INPUTSTREAM_PROP] ='inputstream.adaptive'
+        liz.property['inputstream.adaptive.manifest_type'] = protocol
+        liz.property['inputstream.adaptive.license_type'] = DRM
+        license_key = '%s|authorization=bearer %s|R{SSM}|' % (LICENSE_URL, drm)
+        liz.property['inputstream.adaptive.license_key'] = license_key
+        yield liz
+    else:
+        yield False
+        return

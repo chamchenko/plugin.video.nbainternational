@@ -9,17 +9,26 @@ import urlquick
 
 from resources.lib.vars import *
 from resources.lib.tools import urlencode
-from resources.lib.tools import get_headers
+from resources.lib.auth import get_headers
+from resources.lib.auth import get_device_ids
 from codequick import Route
 from codequick import Listitem
 from codequick import Resolver
 from inputstreamhelper import Helper
 
 
-@Resolver.register(content_type="files")
+
+
+
+@Resolver.register
 def NBA_TV(plugin):
-    plugin.log('NBA_TV', lvl=plugin.DEBUG)
     headers = get_headers()
+    if not headers:
+        yield False
+        return
+    deviceinfos = get_device_ids()
+    DEVICEID = deviceinfos['PCID']
+    PCID = deviceinfos['PCID']
     payload_data = {
                         'type': 'channel',
                         'id': 1,
@@ -50,4 +59,6 @@ def NBA_TV(plugin):
                 liz.property['inputstream.adaptive.license_type'] = DRM
                 license_key = '%s|authorization=bearer %s|R{SSM}|' % (LICENSE_URL, drm)
                 liz.property['inputstream.adaptive.license_key'] = license_key
-    return liz
+                liz.property['ResumeTime'] = '120'
+                liz.property['TotalTime'] = '14400'
+    yield liz

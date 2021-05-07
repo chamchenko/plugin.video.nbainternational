@@ -3,17 +3,15 @@
 # GNU General Public License v2.0+ (see LICENSE.txt or https://www.gnu.org/licenses/gpl-2.0.txt)
 # This file is part of plugin.video.nbainternational
 
-import xbmc
-import json
+
 import urlquick
 import pytz
 import datetime
 import time
-
+import xbmcvfs
 
 from resources.lib.vars import *
 from codequick.utils import ensure_native_str
-from codequick import Listitem
 from codequick import Script
 from dateutil import tz
 from inputstreamhelper import Helper
@@ -28,6 +26,15 @@ except ImportError:
     from urllib import quote_plus
     from urllib import unquote_plus
     from urllib import urlencode
+
+try:
+    from xbmcvfs import translatePath
+except ImportError:
+    from xbmc import translatePath as translatepath
+    def translatePath(path):
+        return translatepath(path).decode('utf-8')
+
+
 
 
 
@@ -44,6 +51,54 @@ def clear_cache(plugin):
 
 
 
+def is_resources():
+    return xbmc.getCondVisibility('System.HasAddon(resource.images.nbainternational)') == 1
+
+
+def check_folder_path(path):
+    end = ''
+    if '/' in path and not path.endswith('/'):
+        end = '/'
+    if '\\' in path and not path.endswith('\\'):
+        end = '\\'
+    return path + end
+
+
+
+def dir_exists(path):
+    return xbmcvfs.exists(path)
+
+
+
+def create_folder(path):
+    if not dir_exists(path):
+        xbmcvfs.mkdirs(path)
+
+
+
+def download_thumb(url, ht, vt):
+    create_folder('special://profile/addon_data/plugin.video.nbainternational/thumbnails/')
+    thumb_file = 'special://profile/addon_data/plugin.video.nbainternational/thumbnails/%s-%s.png' % (ht, vt)
+    rev_thumb = 'special://profile/addon_data/plugin.video.nbainternational/thumbnails/%s-%s.png' % (vt, ht)
+    if not xbmcvfs.exists(thumb_file):
+        try:
+            content = urlquick.get(url).content
+            file_handle = xbmcvfs.File(translatePath(thumb_file), 'wb')
+            file_handle.write(bytearray(content))
+            path = thumb_file
+        except:
+            thumb_file = rev_thumb
+    return thumb_file
+
+
+
+def get_thumb(ht, vt):
+    thumb_file = 'resources/teams/%s/%s-%s.png' % (ht, ht, vt)
+    if not xbmcvfs.exists(thumb_file):
+        thumb_file = 'teams/%s/%s-%s.png' % (vt, vt, ht)
+    return ensure_native_str(MEDIA_PATH % thumb_file)
+
+
 
 def toLocalTimezone(date):
     game_time = datetime.datetime.fromtimestamp(date/1000)
@@ -52,107 +107,47 @@ def toLocalTimezone(date):
     return utc_timezone.localize(game_time).astimezone(local_timezone)
 
 
-def nowEST():
-    if hasattr(nowEST, "datetime"):
-        return nowEST.datetime
-    timezone = pytz.timezone('US/Eastern')
+
+def nowWEST():
+    if hasattr(nowWEST, "datetime"):
+        return nowWEST.datetime
+    timezone = pytz.timezone('US/Pacific')
     utc_datetime = datetime.datetime.utcnow()
     est_datetime = utc_datetime + timezone.utcoffset(utc_datetime)
-    nowEST.datetime = est_datetime
+    nowWEST.datetime = est_datetime
     return est_datetime
 
 
-def authenticate():
-    EMAIL = Script.setting.get_string('username')
-    PASSWORD = Script.setting.get_string('password')
-    FAVORITE = Script.setting.get_string('fav_team')
-    if not EMAIL or not PASSWORD:
-        Script.notify(
-                        plugin.localize(30208),
-                        plugin.localize(30201),
-                        display_time=5000,
-                        sound=True
-                     )
-        return None
 
-    login_session = urlquick.Session()
-    login_headers = {
-                        'User-Agent': USER_AGENT,
-                        'Content-Type': 'application/json',
-                        'X-Client-Platform': 'web',
-                        'Referer': 'https://watch.nba.com/',
-                    }
-    login_payload = {
-                        "email": EMAIL,
-                        "password": PASSWORD,
-                        "rememberMe": True
-                    }
-    try:
-        login_data = login_session.post(
-                                            LOGIN_URL,
-                                            json=login_payload,
-                                            headers=login_headers,
-                                            max_age=120
-                                       ).json()
-    except:
-        Script.notify(
-                        plugin.localize(30209),
-                        plugin.localize(30202),
-                        display_time=5000,
-                        sound=True
-                     )
-        return None
-
-    profile_data = login_session.get(PROFILE_URL, max_age=2592000).json()
-    favorite_team = profile_data['data']['result']['favoriteTeams'][0]['teamTriCode']
-    if favorite_team != FAVORITE:
-        Script.setting.__setitem__('fav_team', favorite_team)
-
-    auth_payload = {
-                        'format': 'json',
-                        'accesstoken': 'true',
-                        'ciamlogin': 'true'
-                   }
-    auth_data = login_session.post(
-                                    AUTH_URL,
-                                    data=auth_payload,
-                                    max_age=120
-                                  ).json()
-    login_status = auth_data['code']
-    access_token = auth_data['data']['accessToken']
-    login_headers.update({'authorization': 'Bearer %s' % access_token})
-    params = {'associations': 'false'}
-    subscrition_data = login_session.post(
-                                            SUBSCRIPTION_URL,
-                                            headers=login_headers,
-                                            max_age=120
-                                         ).json()
-    if 'subs' in subscrition_data:
-        subscrition = subscrition_data['subs'][0]['name']
-        expiration_ = subscrition_data['subs'][0]['accessThrough']
-        country = subscrition_data['subs'][0]['country']
-        expiration_ = subscrition_data['subs'][0]['accessThrough']
-        packages = subscrition_data['subs'][0]['details']
-    elif login_status == "loginsuccess":
-        Script.notify(
-                        plugin.localize(30209),
-                        plugin.localize(30203),
-                        display_time=5000,
-                        sound=True
-                     )
-        return None
-    return access_token
-
-def get_headers():
-    access_token = authenticate()
-    if access_token:
-        headers = {
-                    'User-Agent': USER_AGENT,
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'authorization': 'Bearer %s' % access_token
-                  }
+def gen_title(game_timestamp, teams_info, time_game, host_team_code,
+                away_team_code, game_end_timestamp, playoff_round, game_number):
+    time_stamp_now = int(time.time() * 1000)
+    if game_end_timestamp:
+        if game_end_timestamp < time_stamp_now:
+            status = 'Archive from'
+    elif time_stamp_now < game_timestamp:
+            status = 'UPCOMING starts at'
     else:
-        headers = None
-    return headers
+            status = 'LIVE started'
 
+    if playoff_round and game_number:
+        title = '%s (Game %s) ' %(playoff_round, game_number)
+    else:
+        title = ''
+    host_team = '%s %s' % (
+                            teams_info[host_team_code]['cityname'],
+                            teams_info[host_team_code]['teamname']
+                          )
 
+    away_team = '%s %s' % (
+                            teams_info[away_team_code]['cityname'],
+                            teams_info[away_team_code]['teamname']
+                          )
+
+    title += '%s %s: %s vs %s ' % (
+                                    status,
+                                    time_game,
+                                    away_team,
+                                    host_team
+                                 )
+    return(title)

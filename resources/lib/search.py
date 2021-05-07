@@ -15,6 +15,8 @@ from codequick import Resolver
 
 
 
+
+
 @Resolver.register(autosort=False, content_type="videos")
 def SEARCH_VIDEOS(plugin, search_query, start=0):
     plugin.add_sort_methods(xbmcplugin.SORT_METHOD_UNSORTED)
@@ -50,13 +52,7 @@ def SEARCH_VIDEOS(plugin, search_query, start=0):
             elif sub_vid.attrib['name'] == 'pp_ipn':
                 url = sub_vid.text
                 liz.path = url
-                liz.property[INPUTSTREAM_PROP] ='inputstream.adaptive'
-                for protocol, protocol_info in PROTOCOLS.items():
-                    if any(".%s" % extension in url for extension in protocol_info['extensions']):
-                        liz.property['inputstream.adaptive.manifest_type'] = protocol
-                        yield liz
-                    else:
-                        continue
+                yield liz
     if not liz:
         yield False
         return

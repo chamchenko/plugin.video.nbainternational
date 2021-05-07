@@ -33,6 +33,10 @@ msgctxt "#30003"
 msgid "Favorite Team"
 msgstr ""
 
+msgctxt "#30004"
+msgid "Favorite Players"
+msgstr ""
+
 msgctxt "#30010"
 msgid "Advanced"
 msgstr ""
@@ -40,6 +44,11 @@ msgstr ""
 msgctxt "#30011"
 msgid "Clear Cache"
 msgstr ""
+
+msgctxt "#30012"
+msgid "Cache Games Thumbnails"
+msgstr ""
+
 
 
 # msgs
@@ -59,6 +68,17 @@ msgctxt "#30204"
 msgid "Cache Cleared Successfully"
 msgstr ""
 
+msgctxt "#30205"
+msgid "You have no favorite player, you can set them in your nba account"
+msgstr ""
+
+msgctxt "#30206"
+msgid "You have no favorite team, you can set them in your nba account"
+msgstr ""
+
+msgctxt "#30207"
+msgid "No result found"
+msgstr ""
 
 msgctxt "#30208"
 msgid "Info"

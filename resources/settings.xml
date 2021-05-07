@@ -3,9 +3,9 @@
     <category label="30001">
         <setting id="username" type="text" label="30001" default="" enable="true"/>
         <setting id="password" type="text" label="30002" default="" option="hidden" enable="true"/>
-        <setting id="fav_team" type="text" label="30003" default="" enable="false"/>
     </category>
     <category label="30010">
         <setting label="30011" type="action" action="RunPlugin(plugin://plugin.video.nbalpi/resources/lib/tools/clear_cache/)"/>
+        <setting id="cache_thumb" type="bool" label="30012" default="false"/>
     </category>
 </settings>

@@ -3,22 +3,53 @@
 # GNU General Public License v2.0+ (see LICENSE.txt or https://www.gnu.org/licenses/gpl-2.0.txt)
 # This file is part of plugin.video.nbainternational
 
+
 import urlquick
+import re
 
 from resources.lib.vars import *
 from resources.lib.tools import *
+from resources.lib.search import SEARCH_VIDEOS
 from codequick import Route
 from codequick import Listitem
 from codequick import Resolver
 
 
-@Route.register
-def BROWSE_CLIPS(plugin):
-    pass
 
 
+
+@Route.register(content_type="videos")
+def VIDEO_SUB_MENU(plugin):
+    yield Listitem.from_dict(
+                                BROWSE_VIDEOS,
+                                bold('Fantasy Videos'),
+                                params = {'slug': 'fantasy'}
+                            )
+    yield Listitem.from_dict(
+                                REPLAY_VIDEOS,
+                                bold('Replay Center')
+                            )
+    yield Listitem.from_dict(
+                                BROWSE_VIDEOS,
+                                bold('Clips'),
+                                params = {'slug': 'nba-tv-clips'}
+                            )
+    yield Listitem.from_dict(
+                                PLAYERS_SUB_MENU,
+                                bold('By Players')
+                            )
+    yield Listitem.from_dict(
+                                TEAMS_SUB_MENU,
+                                bold('By Teams')
+                            )
+    yield Listitem.search(
+                            SEARCH_VIDEOS
+                         )
+
+
+
 @Route.register
-def BROWSE_COLLECTIONS(plugin):
+def BROWSE_COLLECTIONS(plugin, content_type="episodes"):
     headers = {'User-Agent': USER_AGENT}
     collections = urlquick.get(
                                 VIDEO_CALLETIONS_URL,
@@ -69,7 +100,7 @@ def BROWSE_COLLECTIONS(plugin):
 
 
 
-@Route.register(autosort=False)
+@Route.register(autosort=False, content_type="episodes")
 def BROWSE_VIDEOS(plugin, slug, page=1):
     headers = {'User-Agent': USER_AGENT}
     per_page = 22
@@ -113,6 +144,37 @@ def BROWSE_VIDEOS(plugin, slug, page=1):
 
 
 
+@Route.register(autosort=False, content_type="videos")
+def REPLAY_VIDEOS(plugin, offset=0):
+    headers = {'User-Agent': USER_AGENT}
+    params = {
+                'offset': 0,
+                'limit': 22,
+             }
+    videos = urlquick.get(
+                            REPLAY_CENTER_URL,
+                            headers=headers,
+                            params=params,
+                            max_age=43200
+                         ).json()
+    for video in videos:
+        thumb = video['thumbnail_url']
+        videoId = re.search('.*/media/(.*)(_[0-9]+x[0-9]+\.[0-9]+)', thumb)[1]
+        url = REPLAY_CENTER_VID_URL % videoId
+        liz = Listitem()
+        liz.label = video['title']
+        liz.art['thumb'] = thumb
+        liz.info['plot'] = '%s: %s' % (
+                                        video['trigger'].replace('-',' ').title(),
+                                        video['teams'].replace('-',' ').title().replace(',',' VS'),
+                                      )
+        liz.info.date(video['date_time'], "%Y-%m-%dT%H:%M:%S%z")
+        liz.path = url
+        yield liz
+    yield Listitem.next_page(offset=offset+22)
+
+
+
 @Resolver.register
 def PLAY_VIDEO(plugin, videoId, title):
     headers = get_headers()
@@ -122,28 +184,48 @@ def PLAY_VIDEO(plugin, videoId, title):
     payload_data = {
                         'type': 'video',
                         'id': videoId,
-                        'drmtoken': True,
                         'deviceid': DEVICEID,
                         'pcid': PCID,
                         'format': 'json'
                    }
-    Response = urlquick.post(
+
+    try:
+        drm = False
+        Response = urlquick.post(
                                 PUBLISH_ENDPOINT,
                                 data=payload_data,
                                 headers=headers
                            ).json()
+    except:
+        payload_data.update({'drmtoken': True})
+        Response = urlquick.post(
+                                PUBLISH_ENDPOINT,
+                                data=payload_data,
+                                headers=headers
+                           ).json()
+        drm = Response['drmToken']
     url = Response['path']
-    drm = Response['drmToken']
+    stream_type = Response['streamType']
+    if stream_type == 'dash':
+        protocol = 'mpd'
+    elif stream_type == 'hls':
+        protocol = 'hls'
+    else:
+        protocol = 'mp4'
     liz = Listitem()
     liz.path = url
     liz.label = title
-    for protocol, protocol_info in PROTOCOLS.items():
-        if any(".%s" % extension in url for extension in protocol_info['extensions']):
-            is_helper = Helper(protocol, drm=DRM)
-            if is_helper.check_inputstream():
-                liz.property[INPUTSTREAM_PROP] ='inputstream.adaptive'
-                liz.property['inputstream.adaptive.manifest_type'] = protocol
-                liz.property['inputstream.adaptive.license_type'] = DRM
-                license_key = '%s|authorization=bearer %s|R{SSM}|' % (LICENSE_URL, drm)
-                liz.property['inputstream.adaptive.license_key'] = license_key
-    yield liz
+    if protocol in ['mpd', 'hls'] and drm:
+        is_helper = Helper(protocol, drm=DRM)
+        if is_helper.check_inputstream():
+            liz.property[INPUTSTREAM_PROP] ='inputstream.adaptive'
+            liz.property['inputstream.adaptive.manifest_type'] = protocol
+            liz.property['inputstream.adaptive.license_type'] = DRM
+            license_key = '%s|authorization=bearer %s|R{SSM}|' % (LICENSE_URL, drm)
+            liz.property['inputstream.adaptive.license_key'] = license_key
+            yield liz
+        else:
+            yield False
+            return
+    else:
+        yield liz

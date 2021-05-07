@@ -11,6 +11,9 @@ from codequick import Script
 from random import choice
 
 
+
+
+
 XBMC_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split('-')[0].split('.')[0])
 INPUTSTREAM_PROP = 'inputstream' if XBMC_VERSION >= 19 else 'inputstreamaddon'
 
@@ -25,27 +28,28 @@ FANART = Script.get_info('fanart')
 EMAIL = Script.setting.get_string('username')
 PASSWORD = Script.setting.get_string('password')
 FAVORITE = Script.setting.get_string('fav_team')
+CACHE_THUMB = Script.setting.get_boolean('cache_thumb')
 
 
 #Web related
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'
-PCID = ''.join(choice('0123456789abcdef-') for n in range(36)).encode('utf-8')
-DEVICEID = 'web-%s' % PCID
 
 IDENTIFY = 'https://identity.nba.com/api/v1/'
 PROFILE_URL = IDENTIFY + 'profile'
 LOGIN_URL = IDENTIFY + 'auth'
+TOKEN_URL = IDENTIFY + 'oauth/token'
 
 WATCH = 'https://watch.nba.com/'
 AUTH_URL = WATCH + 'secure/authenticate'
 GAME_DATA_ENDPOINT = WATCH + 'game/%s?format=json'
 CONFIG_ENDPOINT = WATCH + 'service/config?format=json&cameras=true'
+FREE_TOKEN_URL = WATCH + 'secure/accesstoken'
 
 NBAAPI = 'https://nbaapi.neulion.com/api_nba/v1/'
 SUBSCRIPTION_URL = NBAAPI + 'account/subscriptions'
+RENEW_TOKEN_URL = NBAAPI + 'accesstoken'
 PUBLISH_ENDPOINT = NBAAPI + 'publishpoint'
 GAME_URL = NBAAPI + 'game'
-
 
 TEAMS_URL = 'https://neulion-a.akamaihd.net/nlmobile/nba/config/2014/teams.json'
 CONFIG_URL = 'https://neulionms-a.akamaihd.net/nbad/player/v1/nba/site_spa/config.json'
@@ -59,18 +63,27 @@ THUMB_BASE = 'https://nbadsdmt.akamaized.net/media/nba/nba/thumbs/%s'
 DAILY_URL = 'https://nlnbamdnyc-a.akamaihd.net/fs/nba/feeds_s2019/schedule_atv/%s/%s_%s.js'
 WEEKLY_URL = 'https://nlnbamdnyc-a.akamaihd.net/fs/nba/feeds_s2019/schedule/%s/%s_%s.js?t=%s'
 MONTHLY_URL = 'http://gmsapi.neulion.com/nbagameservice/games/month'
+GAMEDATES_URL = 'https://nbaapi.neulion.com/api_nba/v1/schedule'
 
-
-API_BASE_URL = 'https://content-api-prod.nba.com/public/1/endeavor/'
-NBA_TV_SERIES_URL = API_BASE_URL + 'video-list/nba-tv-series'
+API_BASE_URL = 'https://content-api-prod.nba.com/public/1/'
+NBA_TV_SERIES_URL = API_BASE_URL + 'endeavor/video-list/nba-tv-series'
 NBA_TV_SERIE_URL = NBA_TV_SERIES_URL + '/%s'
-VIDEO_CALLETIONS_URL = API_BASE_URL + 'layout/watch/landing'
-VIDEO_CALLETIONS_URL2 = API_BASE_URL + 'layout/watch/nbatv'
-VIDEO_CALLETIONS_URL3 = API_BASE_URL + 'layout/watch/leaguepass'
-VIDEO_CALLETION_URL = API_BASE_URL + 'video-list/collection/%s'
+VIDEO_CALLETIONS_URL = API_BASE_URL + 'endeavor/layout/watch/landing'
+VIDEO_CALLETIONS_URL2 = API_BASE_URL + 'endeavor/layout/watch/nbatv'
+VIDEO_CALLETIONS_URL3 = API_BASE_URL + 'endeavor/layout/watch/leaguepass'
+VIDEO_CALLETION_URL = API_BASE_URL + 'endeavor/video-list/collection/%s'
+PLAYER_URL = API_BASE_URL + 'content/video'
+TEAM_VODEO_URL = API_BASE_URL + 'content'
 
+REPLAY_CENTER_URL = 'https://official.nba.com/wp-json/api/v1/query_replay_feed'
+REPLAY_CENTER_VID_URL = "https://videos.nba.com/nba/official-replay/media/%s_1280x720.mp4"
 
+PLAYERS_URL = 'https://stats.nba.com/stats/playerindex'
 
+PLAYER_PHOTO_URL = 'https://cdn.nba.com/headshots/nba/latest/1040x760/%s.png'
+PLAYER_GENERIC_URL = 'https://cdn.nba.com/headshots/nba/latest/260x190/logoman.png'
+CAM_LOGO = 'https://cdn.nba.com/logos/nba/Endeavor/cameras/logos/pc/%s'
+MEDIA_PATH = 'resource://resource.images.nbainternational/%s'
 
 
 PROTOCOLS = {
