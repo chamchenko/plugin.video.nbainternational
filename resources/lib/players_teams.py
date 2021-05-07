@@ -134,7 +134,7 @@ def SEARCH_PLAYER(plugin, search_query):
     month = DATE.month
     if month < 10:
         year = year - 1
-    syear = divmod(year, 1000)[1]
+    syear = divmod(year+1, 1000)[1]
     season = '%s-%s' % (year, syear)
     params = {
                 'Historical': 1,

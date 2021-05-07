@@ -18,8 +18,6 @@ from resources.lib.games import BROWSE_GAMES_MENU
 from resources.lib.series import BROWSE_SERIES
 from resources.lib.videos import BROWSE_COLLECTIONS
 from resources.lib.videos import VIDEO_SUB_MENU
-from resources.lib.players_teams import PLAYERS_SUB_MENU
-from resources.lib.players_teams import TEAMS_SUB_MENU
 
 
 
