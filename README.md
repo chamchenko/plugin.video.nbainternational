@@ -1,7 +1,7 @@
 # NBA International Kodi plguin
 
-Live NBA TV, Live and Archive Games, Videos Collections and more
-NBA International League Pass is needed
+- Live NBA TV, Live and Archive Games, Videos Collections and more
+- NBA International League Pass is needed
 
 ## Install tips
  - You can install this plugin by downloading the zip file from this page
