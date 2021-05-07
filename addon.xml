@@ -21,6 +21,19 @@
         <assets>
             <icon>resources/media/icon.png</icon>
             <fanart>resources/media/fanart.jpg</fanart>
+            <screenshot>resources/media/screenshot00001.jpg</screenshot>
+            <screenshot>resources/media/screenshot00002.jpg</screenshot>
+            <screenshot>resources/media/screenshot00003.jpg</screenshot>
+            <screenshot>resources/media/screenshot00004.jpg</screenshot>
+            <screenshot>resources/media/screenshot00005.jpg</screenshot>
+            <screenshot>resources/media/screenshot00006.jpg</screenshot>
+            <screenshot>resources/media/screenshot00007.jpg</screenshot>
+            <screenshot>resources/media/screenshot00008.jpg</screenshot>
+            <screenshot>resources/media/screenshot00009.jpg</screenshot>
+            <screenshot>resources/media/screenshot00010.jpg</screenshot>
+            <screenshot>resources/media/screenshot00011.jpg</screenshot>
+            <screenshot>resources/media/screenshot00012.jpg</screenshot>
+            <screenshot>resources/media/screenshot00013.jpg</screenshot>
         </assets>
         <reuselanguageinvoker>true</reuselanguageinvoker>
     </extension>
