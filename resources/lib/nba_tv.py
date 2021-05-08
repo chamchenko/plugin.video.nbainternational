@@ -24,7 +24,7 @@ from inputstreamhelper import Helper
 def NBA_TV(plugin):
     headers = get_headers()
     if not headers:
-        yield False
+        yield None
         return
     deviceinfos = get_device_ids()
     DEVICEID = deviceinfos['PCID']

@@ -246,6 +246,8 @@ def get_profile_info():
         FAVORITE_PLAYERS = None
     if not FAVORITE_TEAMS or not FAVORITE_PLAYERS:
         access_token = get_cookies()
+        if not access_token:
+            return {'FAVORITE_TEAMS': None, 'FAVORITE_PLAYERS': None}
         headers = {
                     'User-Agent': USER_AGENT,
                     'CIAM_TOKEN': access_token
