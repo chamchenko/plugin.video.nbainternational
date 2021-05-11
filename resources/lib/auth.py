@@ -250,7 +250,7 @@ def get_profile_info():
             return {'FAVORITE_TEAMS': None, 'FAVORITE_PLAYERS': None}
         headers = {
                     'User-Agent': USER_AGENT,
-                    'CIAM_TOKEN': access_token
+                    'authorization': 'Bearer %s' % access_token
                   }
         Script.log('get_profile_info: Getting profile info', lvl=Script.DEBUG)
         profile_data = urlquick.get(
