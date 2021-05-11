@@ -9,6 +9,8 @@ import re
 
 from resources.lib.vars import *
 from resources.lib.tools import *
+from resources.lib.auth import get_headers
+from resources.lib.auth import get_device_ids
 from resources.lib.search import SEARCH_VIDEOS
 from resources.lib.players_teams import PLAYERS_SUB_MENU
 from resources.lib.players_teams import TEAMS_SUB_MENU
@@ -184,6 +186,9 @@ def PLAY_VIDEO(plugin, videoId, title):
     if not headers:
         yield False
         return
+    deviceinfos = get_device_ids()
+    DEVICEID = deviceinfos['PCID']
+    PCID = deviceinfos['PCID']
     payload_data = {
                         'type': 'video',
                         'id': videoId,
