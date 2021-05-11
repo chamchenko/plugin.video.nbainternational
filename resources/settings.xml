@@ -7,5 +7,7 @@
     <category label="30010">
         <setting label="30011" type="action" action="RunPlugin(plugin://plugin.video.nbalpi/resources/lib/tools/clear_cache/)"/>
         <setting id="cache_thumb" type="bool" label="30012" default="false"/>
+        <setting id="disable_msgs" type="bool" label="30013" default="false"/>
+        <setting id="enable_cal" type="bool" label="30014" default="false"/>
     </category>
 </settings>

@@ -121,6 +121,12 @@ def BROWSE_GAMES_MENU(plugin):
                                 BROWSE_GAMES,
                                 bold('Live Games')
                             )
+    if EN_CAL:
+        yield Listitem.from_dict(
+                                    BROWSE_MONTHS,
+                                    bold('Upcoming'),
+                                    params = {'cal': True}
+                                )
     yield Listitem.from_dict(
                                 BROWSE_MONTHS,
                                 bold('Games Archive')
@@ -169,7 +175,8 @@ def BROWSE_TEAMS(plugin, FAVORITE_TEAMS=False):
 
 
 @Route.register
-def BROWSE_DAYS(plugin, month, year, **kwargs):
+def BROWSE_DAYS(plugin, month, year, cal=False, **kwargs):
+    start_day = None
     headers = get_headers(True)
     if not headers:
         yield False
@@ -181,9 +188,13 @@ def BROWSE_DAYS(plugin, month, year, **kwargs):
                 'year': year,
                 'month': month
              }
-    if year == YEAR and month == MONTH:
+    if year == YEAR and month == MONTH and not cal:
         max_age = 0
         max_days = DATE.day - 1
+    elif cal:
+        max_days = None
+        max_age = 0
+        start_day = DATE.day
     else:
         max_age = 7776000
         max_days = None
@@ -195,8 +206,11 @@ def BROWSE_DAYS(plugin, month, year, **kwargs):
                                 headers=headers,
                                 max_age=max_age
                             ).json()['gamedates']
-    if not max_days:
+    if not max_days and not start_day:
         gameDates = reversed(gameDates)
+    elif start_day:
+        n = len(gameDates) - start_day
+        gameDates = gameDates[-n:]
     else:
         gameDates = gameDates[:max_days]
     for gameDate in gameDates:
@@ -212,10 +226,10 @@ def BROWSE_DAYS(plugin, month, year, **kwargs):
             yield Listitem.from_dict(
                                         BROWSE_GAMES,
                                         bold(title),
-                                        params = {
-                                                    'DATE': day
-                                                 }
+                                        params = {'DATE': day}
                                     )
+
+
 
 @Route.register(content_type="videos")
 def BROWSE_GAMES(plugin, DATE=None, games=None):
@@ -254,13 +268,15 @@ def BROWSE_GAMES(plugin, DATE=None, games=None):
 
 
 @Route.register(content_type="videos")
-def BROWSE_MONTHS(plugin, year=None, team=None):
+def BROWSE_MONTHS(plugin, year=None, team=None, cal=False):
+    start_month = 1
     if not year:
         this_year = True
         DATE = nowWEST()
         year = DATE.year
         month = DATE.month
-        if not team:
+        if not team and not cal:
+            start_month = 1
             day = DATE + datetime.timedelta(days=-1)
             yield Listitem.from_dict(
                                         BROWSE_GAMES,
@@ -273,6 +289,22 @@ def BROWSE_MONTHS(plugin, year=None, team=None):
                                         bold('Two Nights Ago'),
                                         params = {'DATE': day}
                                     )
+        if cal:
+            day = DATE + datetime.timedelta(days=+1)
+            yield Listitem.from_dict(
+                                        BROWSE_GAMES,
+                                        bold('Tomorrow'),
+                                        params = {'DATE': day}
+                                    )
+            day = DATE + datetime.timedelta(days=+2)
+            yield Listitem.from_dict(
+                                        BROWSE_GAMES,
+                                        bold('In Two days'),
+                                        params = {'DATE': day}
+                                    )
+            start_month = month
+            month = 12
+
     else:
         this_year = False
         month = 12
@@ -280,7 +312,8 @@ def BROWSE_MONTHS(plugin, year=None, team=None):
     if not headers:
         yield False
         return
-    for m in reversed(range(1,month+1)):
+
+    for m in reversed(range(start_month,month+1)):
         params = { 'month': '%s-%s' % (year, m)}
         month_infos = urlquick.get(
                                     GAMEDATES_URL,
@@ -301,7 +334,8 @@ def BROWSE_MONTHS(plugin, year=None, team=None):
             title = calendar.month_name[m]
             
         if not team:
-            title = '%s (%s games)' % (title, game_count)
+            if not cal:
+                title = '%s (%s games)' % (title, game_count)
             callB = BROWSE_DAYS
         else:
             callB = BROWSE_MONTH
@@ -311,17 +345,19 @@ def BROWSE_MONTHS(plugin, year=None, team=None):
                                     params = {
                                                 'month': m,
                                                 'year': year,
+                                                'team': team,
+                                                'cal': cal
+                                             }
+                                )
+    if not cal:
+        yield Listitem.from_dict(
+                                    BROWSE_YEARS,
+                                    bold('Older'),
+                                    params = {
+                                                'year': year,
                                                 'team': team
                                              }
                                 )
-    yield Listitem.from_dict(
-                                BROWSE_YEARS,
-                                bold('Older'),
-                                params = {
-                                            'year': year,
-                                            'team': team
-                                         }
-                            )
 
 
 
@@ -489,7 +525,7 @@ def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd
         liz.property['inputstream.adaptive.manifest_update_parameter'] = 'full'
         """
         if start_point:
-           plugin.log('PLAY_GAME start_point: %s' % start_point, lvl=plugin.DEBUG)
+            plugin.log('PLAY_GAME start_point: %s' % start_point, lvl=plugin.DEBUG)
             liz.property['ResumeTime'] = start_point
             liz.property['TotalTime'] = '14400'
         """

@@ -42,6 +42,10 @@ except ImportError:
 def clear_cache(plugin):
     # Clear urlquick cache
     urlquick.cache_cleanup(-1)
+    # remove storages
+    storages_path = 'special://profile/addon_data/plugin.video.nbainternational/%s'
+    xbmcvfs.delete(translatePath(storages_path % '.accountinfo.profileinfo'))
+    xbmcvfs.delete(translatePath(storages_path % '.accountinfo.token'))
     Script.notify(
                     plugin.localize(30208),
                     plugin.localize(30204),

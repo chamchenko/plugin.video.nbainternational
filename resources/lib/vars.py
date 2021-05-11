@@ -29,7 +29,8 @@ EMAIL = Script.setting.get_string('username')
 PASSWORD = Script.setting.get_string('password')
 FAVORITE = Script.setting.get_string('fav_team')
 CACHE_THUMB = Script.setting.get_boolean('cache_thumb')
-
+DIS_MSGS = Script.setting.get_boolean('disable_msgs')
+EN_CAL = Script.setting.get_boolean('enable_cal')
 
 #Web related
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'

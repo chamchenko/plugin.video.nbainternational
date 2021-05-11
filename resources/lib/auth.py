@@ -23,9 +23,9 @@ login_headers = {
                     'Content-Type': 'application/json'
                 }
 auth_payload = {
-                        'format': 'json',
-                        'accesstoken': 'true',
-                        'ciamlogin': 'true'
+                    'format': 'json',
+                    'accesstoken': 'true',
+                    'ciamlogin': 'true'
                }
 
 
@@ -268,14 +268,14 @@ def get_profile_info():
         profileinfo['fav_team'] = FAVORITE_TEAMS
         profileinfo['fav_players'] = FAVORITE_PLAYERS
         profileinfo.flush()
-        if not FAVORITE_PLAYERS:
+        if not FAVORITE_PLAYERS and not DIS_MSGS:
             Script.notify(
                             Script.localize(30208),
                             Script.localize(30205),
                             display_time=5000,
                             sound=True
                          )
-        if not FAVORITE_TEAMS:
+        if not FAVORITE_TEAMS and not DIS_MSGS:
             Script.notify(
                             Script.localize(30208),
                             Script.localize(30206),
