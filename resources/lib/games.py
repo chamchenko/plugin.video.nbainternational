@@ -49,7 +49,7 @@ def process_games(game, teams_info):
         host_team_code = game['h']
         away_team_code = game['v']
         game_state = game['gs']
-        game_time_local = toLocalTimezone(game_timestamp)
+        game_time_local = toLocalTimezone(time.mktime(game_time) * 1000)
         time_game = game_time_local.strftime("%H:%M")
         title = gen_title(
                             game_timestamp,
