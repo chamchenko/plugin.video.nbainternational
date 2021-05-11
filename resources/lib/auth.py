@@ -298,7 +298,7 @@ def get_device_ids():
                     lvl=Script.DEBUG
                   )
         profileinfo['PCID'] = ''.join(choice('0123456789abcdef-') for n in range(36)).encode('utf-8')
-        profileinfo['DEVICEID'] = 'web-%s' % PCID
+        profileinfo['DEVICEID'] = 'web-%s' % profileinfo['PCID']
         profileinfo.flush()
         Script.log('get_device_ids: stored device ids to cache', lvl=Script.DEBUG)
         return {'PCID': profileinfo['PCID'], 'DEVICEID': profileinfo['DEVICEID']}
