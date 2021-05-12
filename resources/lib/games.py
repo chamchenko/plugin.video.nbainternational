@@ -480,7 +480,6 @@ def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd
         protocol = 'hls'
     # no audio when inputstream adaptive is provided with resume time
     # waiting to a fix in inputstream adaptive code to enable this
-    """
     headers = {'User-Agent': USER_AGENT}
     start_point = None
 
@@ -508,7 +507,6 @@ def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd
             start_point = str(int((start_time - stream_start_ts) / 1000))
         elif ret == 1 :
             start_point = str(duration - 120).split('.')[0]
-    """
     liz = Listitem()
     liz.path = url
     liz.label = name
@@ -523,12 +521,10 @@ def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd
         license_key = '%s|authorization=bearer %s|R{SSM}|' % (LICENSE_URL, drm)
         liz.property['inputstream.adaptive.license_key'] = license_key
         liz.property['inputstream.adaptive.manifest_update_parameter'] = 'full'
-        """
         if start_point:
             plugin.log('PLAY_GAME start_point: %s' % start_point, lvl=plugin.DEBUG)
             liz.property['ResumeTime'] = start_point
             liz.property['TotalTime'] = '14400'
-        """
         yield liz
     else:
         yield False
