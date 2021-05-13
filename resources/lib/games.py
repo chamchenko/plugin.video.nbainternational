@@ -362,7 +362,7 @@ def BROWSE_MONTHS(plugin, year=None, team=None, cal=False):
 
 
 @Route.register(content_type="videos")
-def BROWSE_MONTH(plugin, year, month, team):
+def BROWSE_MONTH(plugin, year, month, team, **kwargs):
     headers = {'User-Agent': USER_AGENT}
     teams_info = urlquick.get(
                                 TEAMS_URL,
@@ -523,6 +523,7 @@ def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd
         license_key = '%s|authorization=bearer %s|R{SSM}|' % (LICENSE_URL, drm)
         liz.property['inputstream.adaptive.license_key'] = license_key
         liz.property['inputstream.adaptive.manifest_update_parameter'] = 'full'
+        liz.property['inputstream.adaptive.play_timeshift_buffer'] = 'true'
         """
         if start_point:
             plugin.log('PLAY_GAME start_point: %s' % start_point, lvl=plugin.DEBUG)
