@@ -169,13 +169,14 @@ def get_token():
                                     ).json()
     if 'subs' in subscrition_data:
         Script.log('get_token: found subscrition infos', lvl=Script.DEBUG)
+        """ 
         subscrition_type = subscrition_data['subs'][0]['productSubType']
         subscrition = subscrition_data['subs'][0]['name']
-        expiration_ = subscrition_data['subs'][0]['accessThrough']
         country = subscrition_data['subs'][0]['country']
         expiration = subscrition_data['subs'][0]['accessThrough']
         Script.log('get_token: Found expriation date %s' % expiration, lvl=Script.DEBUG)
         packages = subscrition_data['subs'][0]['details']
+        """
     else:
         Script.log('get_token: subscrition infos unavailable', lvl=Script.DEBUG)
         Script.notify(

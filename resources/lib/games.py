@@ -102,6 +102,10 @@ def process_games(game, teams_info):
                     rd = True
                     gt = 256
             feeds.append({ 'name': name, 'gt': gt, 'cn': cn, 'rd': rd})
+        if 'video' in game:
+            if 'c' in game['video']:
+                name = 'Condensed Game'
+                feeds.append({ 'name': name, 'gt': 8, 'cn': None, 'rd': False})
         liz.set_callback(
                             BROWSE_GAME,
                             gameID=gameID,
