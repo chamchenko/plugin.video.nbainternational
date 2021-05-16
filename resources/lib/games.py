@@ -46,8 +46,8 @@ def process_games(game, teams_info):
             playoff_round = None
             game_number = None
         game_timestamp = int(calendar.timegm(game_time) * 1000)
-        host_team_code = game['h']
-        away_team_code = game['v']
+        host_team_code = game['h'] or 'TBD'
+        away_team_code = game['v'] or 'TBD'
         game_state = game['gs']
         game_time_local = toLocalTimezone(time.mktime(game_time) * 1000)
         time_game = game_time_local.strftime("%H:%M")
