@@ -138,15 +138,20 @@ def gen_title(game_timestamp, teams_info, time_game, host_team_code,
         title = '%s (Game %s) ' %(playoff_round, game_number)
     else:
         title = ''
-    host_team = '%s %s' % (
-                            teams_info[host_team_code]['cityname'],
-                            teams_info[host_team_code]['teamname']
-                          )
-
-    away_team = '%s %s' % (
-                            teams_info[away_team_code]['cityname'],
-                            teams_info[away_team_code]['teamname']
-                          )
+    if host_team_code != 'TBD':
+        host_team = '%s %s' % (
+                                teams_info[host_team_code]['cityname'],
+                                teams_info[host_team_code]['teamname']
+                              )
+    else:
+        host_team = host_team_code
+    if away_team_code != 'TBD':
+        away_team = '%s %s' % (
+                                teams_info[away_team_code]['cityname'],
+                                teams_info[away_team_code]['teamname']
+                              )
+    else:
+        away_team = away_team_code
 
     title += '%s %s: %s vs %s ' % (
                                     status,
