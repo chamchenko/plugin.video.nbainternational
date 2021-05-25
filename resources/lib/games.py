@@ -483,9 +483,7 @@ def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd
             protocol = 'hls'
     except:
         protocol = 'hls'
-    # no audio when inputstream adaptive is provided with resume time
-    # waiting to a fix in inputstream adaptive code to enable this
-
+        
     headers = {'User-Agent': USER_AGENT}
     start_point = None
     if game_type == 'live':
@@ -511,7 +509,7 @@ def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd
             stream_start_ts = calendar.timegm(stream_start) * 1000
             start_point = str(int((start_time - stream_start_ts) / 1000))
         elif ret == 1 :
-            start_point = str(duration - 120).split('.')[0]
+            start_point = str(duration).split('.')[0]
 
     liz = Listitem()
     liz.path = url

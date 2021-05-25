@@ -67,7 +67,7 @@ msgid "Login Failed"
 msgstr ""
 
 msgctxt "#30203"
-msgid "You're account don't have an active subscrition or your subscrition doesn't match your geolocation"
+msgid "Your account doesn't have an active subscrition or your subscrition doesn't match your geolocation"
 msgstr ""
 
 msgctxt "#30204"
