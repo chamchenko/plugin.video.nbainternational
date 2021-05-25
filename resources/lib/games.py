@@ -212,7 +212,7 @@ def BROWSE_DAYS(plugin, month, year, cal=False, **kwargs):
                             ).json()['gamedates']
     if not max_days and not start_day:
         gameDates = reversed(gameDates)
-    elif start_day:
+    elif start_day and int(m) == MONTH:
         n = len(gameDates) - start_day
         gameDates = gameDates[-n:]
     else:
