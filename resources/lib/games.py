@@ -33,10 +33,6 @@ def process_games(game, teams_info):
         game_time = game['st']
         game_time = time.strptime(game_time, '%Y-%m-%dT%H:%M:%S.%f')
         game_end_timestamp = None
-        if 'et' in game:
-            game_end = game['et']
-            game_end = time.strptime(game_end, '%Y-%m-%dT%H:%M:%S.%f')
-            game_end_timestamp = int(calendar.timegm(game_end) * 1000)
         if 'playoff' in game:
             playoff_round = game['playoff']['round']
             host_team_record = int(game['playoff']['hr'].split('-')[0])
@@ -45,6 +41,13 @@ def process_games(game, teams_info):
         else:
             playoff_round = None
             game_number = None
+        if 'et' in game:
+            game_end = game['et']
+            game_end = time.strptime(game_end, '%Y-%m-%dT%H:%M:%S.%f')
+            game_end_timestamp = int(calendar.timegm(game_end) * 1000)
+        else:
+            if game_number:
+                game_number = gameID[-1]
         game_timestamp = int(calendar.timegm(game_time) * 1000)
         host_team_code = game['h'] or 'TBD'
         away_team_code = game['v'] or 'TBD'
