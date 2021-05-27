@@ -143,7 +143,7 @@ def BROWSE_GAMES_MENU(plugin):
                                     BROWSE_TEAMS,
                                     bold('Favortite Team\'s Games'),
                                     params={'FAVORITE_TEAMS': FAVORITE_TEAMS}
-                                )  
+                                )
     yield Listitem.from_dict(
                                 BROWSE_TEAMS,
                                 bold('Teams')
@@ -339,7 +339,7 @@ def BROWSE_MONTHS(plugin, year=None, team=None, cal=False):
             title = 'Last Month'
         else:
             title = calendar.month_name[m]
-            
+
         if not team:
             if not cal:
                 title = '%s (%s games)' % (title, game_count)
@@ -486,17 +486,20 @@ def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd
             protocol = 'hls'
     except:
         protocol = 'hls'
-        
+
     headers = {'User-Agent': USER_AGENT}
     start_point = None
+    live_play_type = int(Script.setting.get_string('live_play_type'))
+    ret = None
     if game_type == 'live':
-        line1 = "Start from Beginning"
-        line2 = "Go LIVE"
-        ret = xbmcgui.Dialog().select("Game Options", [line1, line2])
-        if ret == -1:
-            yield None
-            return
-        if ret == 0:
+        if live_play_type == 0:
+            line1 = "Start from Beginning"
+            line2 = "Go LIVE"
+            ret = xbmcgui.Dialog().select("Game Options", [line1, line2])
+            if ret == -1:
+                yield None
+                return
+        if ret == 0 or live_play_type == 2:
             url = url.replace('br_long_master', 'master')
         content = urlquick.get(url, headers=headers).text
         sample = re.findall('(.*video.*\.m3u8?)', content)[0]
@@ -506,12 +509,12 @@ def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd
         content = urlquick.get(ql_url, headers=headers, max_age=0).text
         durations = re.findall('\#EXTINF\:([0-9]+\.[0-9]+)\,', content)
         duration = sum([float(i) for i in durations])
-        if ret == 0:
+        if ret == 0 or live_play_type == 2:
             stream_start = re.findall('PROGRAM\-DATE\-TIME\:(.*)', content)[0]
             stream_start = time.strptime(stream_start, '%Y-%m-%dT%H:%M:%S.%fZ')
             stream_start_ts = calendar.timegm(stream_start) * 1000
             start_point = str(int((start_time - stream_start_ts) / 1000))
-        elif ret == 1 :
+        elif ret == 1 or live_play_type == 1 :
             start_point = str(duration).split('.')[0]
 
     liz = Listitem()

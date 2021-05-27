@@ -57,6 +57,10 @@ msgctxt "#30014"
 msgid "Show Upcoming"
 msgstr ""
 
+msgctxt "#30015"
+msgid "Live Play Action"
+msgstr ""
+
 # msgs
 msgctxt "#30201"
 msgid "Please fill Email and Password in the addon's settings menu"
