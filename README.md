@@ -14,4 +14,4 @@
  - Search across the NBA videos database
 
 ## To-Do
- - Add possibility to chose within the settings to automatically go live/start from the beginning for live games
+
