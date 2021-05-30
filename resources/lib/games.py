@@ -263,7 +263,7 @@ def BROWSE_GAMES(plugin, DATE=None, games=None):
     if EN_CAL:
         yield Listitem.from_dict(
                                     BROWSE_MONTHS,
-                                    bold('Upcoming'),
+                                    bold('Upcoming Games Menu'),
                                     params = {'cal': True}
                                 )        
         return
