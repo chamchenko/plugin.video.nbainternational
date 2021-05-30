@@ -125,10 +125,6 @@ def process_games(game, teams_info):
 def BROWSE_GAMES_MENU(plugin):
     FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']
     yield Listitem.from_dict(
-                                BROWSE_GAMES,
-                                bold('Live Games')
-                            )
-    yield Listitem.from_dict(
                                 BROWSE_MONTHS,
                                 bold('Archive Games')
                             )
