@@ -29,12 +29,12 @@ def root(plugin):
     plugin.log('Creating Main Menu', lvl=plugin.WARNING)
     profileinfo = get_profile_info()
     yield Listitem.from_dict(
-                                LIVE_GAME_MENU,
+                                BROWSE_GAMES,
                                 bold('Live Games')
                             )
     yield Listitem.from_dict(
                                 BROWSE_GAMES_MENU,
-                                bold('Games(More)')
+                                bold('Archive Games')
                             )
     yield Listitem.from_dict(
                                 NBA_TV,
