@@ -137,7 +137,7 @@ def BROWSE_GAMES_MENU(plugin):
     FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']                                                                                                        
     yield Listitem.from_dict(
                                 BROWSE_MONTHS,
-                                bold('Games Archive')
+                                bold('Archive Games')
                             )
     if FAVORITE_TEAMS:
         yield Listitem.from_dict(
