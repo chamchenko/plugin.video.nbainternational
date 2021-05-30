@@ -13,8 +13,7 @@ from codequick.utils import bold
 from resources.lib.tools import *
 from resources.lib.vars import *
 from resources.lib.auth import get_profile_info
-from resources.lib.games import BROWSE_GAMES
-from resources.lib.games import BROWSE_GAME
+from resources.lib.games import LIVE_GAME_MENU
 from resources.lib.games import BROWSE_GAMES_MENU
 from resources.lib.nba_tv import NBA_TV
 from resources.lib.series import BROWSE_SERIES
@@ -30,7 +29,7 @@ def root(plugin):
     plugin.log('Creating Main Menu', lvl=plugin.WARNING)
     profileinfo = get_profile_info()
     yield Listitem.from_dict(
-                                BROWSE_GAMES,
+                                LIVE_GAME_MENU,
                                 bold('Live Games')
                             )
     yield Listitem.from_dict(
