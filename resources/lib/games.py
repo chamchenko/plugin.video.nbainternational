@@ -121,7 +121,8 @@ def process_games(game, teams_info):
 
 
 @Route.register(content_type='videos')
-def LIVE_GAME_MENU(plugin):   
+def LIVE_GAME_MENU(plugin):
+    FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']      
     yield Listitem.from_dict(   BROWSE_GAMES,
                                 bold('Live Games')
     if EN_CAL:
