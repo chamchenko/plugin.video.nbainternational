@@ -53,7 +53,7 @@ def process_games(game, teams_info):
         away_team_code = game['v'] or 'TBD'
         game_state = game['gs']
         game_time_local = toLocalTimezone(time.mktime(game_time) * 1000)
-        time_game = game_time_local.strftime("%H:%M")
+        time_game = game_time_local.strftime("%I:%M %p")
         title = gen_title(
                             game_timestamp,
                             teams_info,
@@ -123,11 +123,6 @@ def process_games(game, teams_info):
 
 @Route.register(content_type="videos")
 def BROWSE_GAMES_MENU(plugin):
-    FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']
-    yield Listitem.from_dict(
-                                BROWSE_GAMES,
-                                bold('Live Games')
-                            )
     if EN_CAL:
         yield Listitem.from_dict(
                                     BROWSE_MONTHS,
