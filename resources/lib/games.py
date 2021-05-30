@@ -118,28 +118,16 @@ def process_games(game, teams_info):
                             feeds=feeds
                         )
         return liz
-
-
-@Route.register(content_type='videos')
-def LIVE_GAME_MENU(plugin):
-    FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']      
-    yield Listitem.from_dict(
-                                 PLAY_GAME,
-                                 bold(feed['name']),
-                                 params = feed
-                             )
-    if EN_CAL:
-        yield Listitem.from_dict(
-                                    BROWSE_MONTHS,
-                                    bold('Upcoming'),
-                                    params = {'cal': True}
-                                )
                 
 
                 
 @Route.register(content_type="videos")
 def BROWSE_GAMES_MENU(plugin):
-    FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']                                                                                                        
+    FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']
+    yield Listitem.from_dict(
+                                BROWSE_GAMES,
+                                bold('Live Games')
+                            )
     yield Listitem.from_dict(
                                 BROWSE_MONTHS,
                                 bold('Archive Games')
@@ -276,6 +264,12 @@ def BROWSE_GAMES(plugin, DATE=None, games=None):
 
     if not liz:
         yield False
+    if EN_CAL:
+        yield Listitem.from_dict(
+                                    BROWSE_MONTHS,
+                                    bold('Upcoming'),
+                                    params = {'cal': True}
+                                )        
         return
 
 
