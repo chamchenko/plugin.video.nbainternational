@@ -227,9 +227,8 @@ def BROWSE_DAYS(plugin, month, year, cal=False, **kwargs):
                                     )
 
 
-
 @Route.register(content_type="videos")
-def BROWSE_GAMES(plugin, DATE=None, games=None):
+def BROWSE_LIVE(plugin, DATE=None, games=None):
     if not DATE:
         DATE = nowWEST()
     headers = {'User-Agent': USER_AGENT}
@@ -266,6 +265,42 @@ def BROWSE_GAMES(plugin, DATE=None, games=None):
                                     bold('Upcoming Games Menu'),
                                     params = {'cal': True}
                                 )        
+        return
+        
+        
+        
+@Route.register(content_type="videos")
+def BROWSE_GAMES(plugin, DATE=None, games=None):
+    if not DATE:
+        DATE = nowWEST()
+    headers = {'User-Agent': USER_AGENT}
+    teams_info = urlquick.get(
+                                TEAMS_URL,
+                                headers=headers,
+                                max_age=7776000
+                             ).json()['teams']
+    if not games:
+        todays_game_url = DAILY_URL % (
+                                         DATE.year,
+                                         DATE.month,
+                                         DATE.day
+                                       )
+        resp = urlquick.get(
+                                todays_game_url,
+                                headers=headers,
+                                max_age=0
+                            ).text.replace('var g_schedule=','')
+        games = json.loads(resp)
+    liz = None
+    for game in games['games']:
+        if 'game' in game:
+            if not game['game']:
+                continue
+        liz = process_games(game, teams_info)
+        yield liz
+
+    if not liz:
+        yield False       
         return
 
 
