@@ -127,12 +127,13 @@ def LIVE_GAME_MENU(plugin):
                                 bold('Live Games')
                             ) 
     if EN_CAL:
-        yield Listitem.from_dict(   
+        yield Listitem.from_dict(
                                     BROWSE_MONTHS,
-                                    bold('Upcoming')          
+                                    bold('Upcoming'),
                                     params = {'cal': True}
                                 )
                 
+
                 
 @Route.register(content_type="videos")
 def BROWSE_GAMES_MENU(plugin):
