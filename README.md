@@ -8,6 +8,7 @@
  - To get automatic updates you can download and install my repository from https://github.com/chamchenko/repository.chamchenko
 
 ## What Works
+ - Live NBA Games
  - Live NBA TV
  - Video Collections and NBA TV Series
  - Browsing videos by team/player
