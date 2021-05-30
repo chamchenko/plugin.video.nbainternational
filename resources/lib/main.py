@@ -29,7 +29,7 @@ def root(plugin):
     plugin.log('Creating Main Menu', lvl=plugin.WARNING)
     profileinfo = get_profile_info()
     yield Listitem.from_dict(
-                                BROWSE_GAMES,
+                                BROWSE_LIVE,
                                 bold('Live Games')
                             )
     yield Listitem.from_dict(
