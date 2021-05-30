@@ -130,7 +130,7 @@ def LIVE_GAME_MENU(plugin):
                                     BROWSE_MONTHS,
                                     bold('Upcoming')          
                                     params = {'cal': True}
-
+                               )
                 
                 
 @Route.register(content_type="videos")
