@@ -122,8 +122,8 @@ def process_games(game, teams_info):
 
 
 @Route.register(content_type="videos")
-FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']
 def BROWSE_GAMES_MENU(plugin):
+    FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']    
     if EN_CAL:
         yield Listitem.from_dict(
                                     BROWSE_MONTHS,
