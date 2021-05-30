@@ -38,7 +38,7 @@ def root(plugin):
                             )
     yield Listitem.from_dict(
                                 NBA_TV,
-                                bold('NBA Tv')
+                                bold('NBA TV')
                             )
     yield Listitem.from_dict(
                                 BROWSE_SERIES,
