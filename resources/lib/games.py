@@ -77,34 +77,68 @@ def process_games(game, teams_info):
         liz.art["thumb"] = thumb
         liz.art["poster"] = thumb
         feeds = []
-        for feed in game['caData']:
-            gt = 1
-            cn = None
-            rd = False
-            if 'name' in feed:
-                name = feed['name']
+        if 'caData' in game:
+            for feed in game['caData']:
+                gt = 1
+                cn = None
+                rd = False
+                if 'name' in feed:
+                    name = feed['name']
+                    if 'cat' in feed:
+                        name = '%s: %s' %(feed['cat'], name)
+                elif 'subcat' in feed:
+                    if feed['subcat'] == 'Teams' and feed['id'] == 'a':
+                        name = 'Home Feed (%s)' % host_team_code
+                    elif feed['subcat'] == 'Teams' and feed['id'] == 'b':
+                        name = 'Away Feed (%s)' % away_team_code
+                        gt = 4
                 if 'cat' in feed:
-                    name = '%s: %s' %(feed['cat'], name)
-            elif 'subcat' in feed:
-                if feed['subcat'] == 'Teams' and feed['id'] == 'a':
-                    name = 'Home Feed (%s)' % host_team_code
-                elif feed['subcat'] == 'Teams' and feed['id'] == 'b':
-                    name = 'Away Feed (%s)' % away_team_code
-                    gt = 4
-            if 'cat' in feed:
-                if feed['cat'] == 'Condensed':
-                    gt = 8
+                    if feed['cat'] == 'Condensed':
+                        gt = 8
+                    else:
+                        name = 'Full Game %s' % name
                 else:
-                    name = 'Full Game %s' %name
-            else:
-                name = 'Full Game %s' %name
-            if feed['id'].isnumeric():
-                cn = int(feed['id'])
-            if 'audio' in feed:
-                if feed['audio']:
-                    rd = True
-                    gt = 256
-            feeds.append({ 'name': name, 'gt': gt, 'cn': cn, 'rd': rd})
+                    name = 'Full Game %s' % name
+                if feed['id'].isnumeric():
+                    cn = int(feed['id'])
+                if 'audio' in feed:
+                    if feed['audio']:
+                        rd = True
+                        gt = 256
+                feeds.append({ 'name': name, 'gt': gt, 'cn': cn, 'rd': rd})
+        else:
+            name = 'Full Game Home Feed (%s)' % host_team_code
+            feeds.append({ 'name': name, 'gt': 1, 'cn': None, 'rd': False})
+            if 'af' in game['video']:
+                name = 'Full Game Away Feed (%s)' % away_team_code
+                feeds.append({ 'name': name, 'gt': 4, 'cn': None, 'rd': False})
+            if 'cameraAngles' in game:
+                game_cameras = game['cameraAngles'].split(',')
+                headers = {'User-Agent': USER_AGENT}
+                nba_config = urlquick.get(
+                                            CONFIG_ENDPOINT,
+                                            headers=headers,
+                                            max_age=-1
+                                         ).json()
+                nba_cameras = {}
+                for camera in nba_config['content']['cameras']:
+                    if camera['number'] == 0 or camera['number'] == 9:
+                        continue
+                    if 'audio' in camera:
+                        rd = True
+                        gt = 256
+                    else:
+                        rd = False
+                        gt = 1
+                    nba_cameras[camera['number']] = {'name': camera['name'], 'rd': rd, 'gt': gt}
+                for camera in game_cameras:
+                    camera = int(camera)
+                    if camera == 0 or camera == 9:
+                        continue
+                    name = 'Full Game %s' % nba_cameras[camera]['name']
+                    rd = nba_cameras[camera]['rd']
+                    gt = nba_cameras[camera]['gt']
+                    feeds.append({ 'name': name, 'gt': gt, 'cn': camera, 'rd': rd})               
         if 'video' in game:
             if 'c' in game['video']:
                 name = 'Condensed Game'
