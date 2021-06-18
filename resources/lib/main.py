@@ -13,8 +13,9 @@ from codequick.utils import bold
 from resources.lib.tools import *
 from resources.lib.vars import *
 from resources.lib.auth import get_profile_info
-from resources.lib.nba_tv import NBA_TV
+from resources.lib.games import BROWSE_LIVE
 from resources.lib.games import BROWSE_GAMES_MENU
+from resources.lib.nba_tv import NBA_TV
 from resources.lib.series import BROWSE_SERIES
 from resources.lib.videos import BROWSE_COLLECTIONS
 from resources.lib.videos import VIDEO_SUB_MENU
@@ -28,12 +29,16 @@ def root(plugin):
     plugin.log('Creating Main Menu', lvl=plugin.WARNING)
     profileinfo = get_profile_info()
     yield Listitem.from_dict(
-                                NBA_TV,
-                                bold('NBA TV')
+                                BROWSE_LIVE,
+                                bold('Live Games')
                             )
     yield Listitem.from_dict(
                                 BROWSE_GAMES_MENU,
-                                bold('Games')
+                                bold('Archive Games')
+                            )
+    yield Listitem.from_dict(
+                                NBA_TV,
+                                bold('NBA TV')
                             )
     yield Listitem.from_dict(
                                 BROWSE_SERIES,

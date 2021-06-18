@@ -9,6 +9,6 @@
         <setting id="cache_thumb" type="bool" label="30012" default="false"/>
         <setting id="disable_msgs" type="bool" label="30013" default="false"/>
         <setting id="enable_cal" type="bool" label="30014" default="false"/>
-        <setting id="live_play_type" type="enum" label="30015" default="0" values="Ask|Go Live|From The beginning|Kodi 18"/>
+        <setting id="live_play_type" type="enum" label="30015" default="0" values="Ask|Live|From Start|Kodi 18"/>
     </category>
 </settings>

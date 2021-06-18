@@ -53,7 +53,7 @@ def process_games(game, teams_info):
         away_team_code = game['v'] or 'TBD'
         game_state = game['gs']
         game_time_local = toLocalTimezone(time.mktime(game_time) * 1000)
-        time_game = game_time_local.strftime("%H:%M")
+        time_game = game_time_local.strftime("%I:%M %p")
         title = gen_title(
                             game_timestamp,
                             teams_info,
@@ -152,25 +152,15 @@ def process_games(game, teams_info):
                             feeds=feeds
                         )
         return liz
+                
 
-
-
+                
 @Route.register(content_type="videos")
 def BROWSE_GAMES_MENU(plugin):
     FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']
     yield Listitem.from_dict(
-                                BROWSE_GAMES,
-                                bold('Live Games')
-                            )
-    if EN_CAL:
-        yield Listitem.from_dict(
-                                    BROWSE_MONTHS,
-                                    bold('Upcoming'),
-                                    params = {'cal': True}
-                                )
-    yield Listitem.from_dict(
                                 BROWSE_MONTHS,
-                                bold('Games Archive')
+                                bold('Archive Games')
                             )
     if FAVORITE_TEAMS:
         yield Listitem.from_dict(
@@ -271,7 +261,48 @@ def BROWSE_DAYS(plugin, month, year, cal=False, **kwargs):
                                     )
 
 
+@Route.register(content_type="videos")
+def BROWSE_LIVE(plugin, DATE=None, games=None):
+    if not DATE:
+        DATE = nowWEST()
+    headers = {'User-Agent': USER_AGENT}
+    teams_info = urlquick.get(
+                                TEAMS_URL,
+                                headers=headers,
+                                max_age=7776000
+                             ).json()['teams']
+    if not games:
+        todays_game_url = DAILY_URL % (
+                                         DATE.year,
+                                         DATE.month,
+                                         DATE.day
+                                       )
+        resp = urlquick.get(
+                                todays_game_url,
+                                headers=headers,
+                                max_age=0
+                            ).text.replace('var g_schedule=','')
+        games = json.loads(resp)
+    liz = None
+    for game in games['games']:
+        if 'game' in game:
+            if not game['game']:
+                continue
+        liz = process_games(game, teams_info)
+        yield liz
 
+    if not liz:
+        yield False
+    if EN_CAL:
+        yield Listitem.from_dict(
+                                    BROWSE_MONTHS,
+                                    bold('>Upcoming Games Menu<'),
+                                    params = {'cal': True}
+                                )        
+        return
+        
+        
+        
 @Route.register(content_type="videos")
 def BROWSE_GAMES(plugin, DATE=None, games=None):
     if not DATE:
@@ -303,7 +334,7 @@ def BROWSE_GAMES(plugin, DATE=None, games=None):
         yield liz
 
     if not liz:
-        yield False
+        yield False       
         return
 
 

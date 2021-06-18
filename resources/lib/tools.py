@@ -128,35 +128,27 @@ def gen_title(game_timestamp, teams_info, time_game, host_team_code,
     time_stamp_now = int(time.time() * 1000)
     if game_end_timestamp:
         if game_end_timestamp < time_stamp_now:
-            status = 'Archive from'
+            status = 'FINISHED: '
     elif time_stamp_now < game_timestamp:
-            status = 'UPCOMING starts at'
+            status = 'UPCOMING: '
     else:
-            status = 'LIVE started'
+            status = 'LIVE: '
 
-    if playoff_round and game_number:
-        title = '%s (Game %s) ' %(playoff_round, game_number)
-    else:
-        title = ''
     if host_team_code != 'TBD':
-        host_team = '%s %s' % (
-                                teams_info[host_team_code]['cityname'],
-                                teams_info[host_team_code]['teamname']
-                              )
+        host_team = '%s' % (
+                             teams_info[host_team_code]['teamname']
+                           )
     else:
         host_team = host_team_code
     if away_team_code != 'TBD':
-        away_team = '%s %s' % (
-                                teams_info[away_team_code]['cityname'],
-                                teams_info[away_team_code]['teamname']
-                              )
+        away_team = '%s' % (
+                             teams_info[away_team_code]['teamname']
+                           )
     else:
         away_team = away_team_code
+    if playoff_round and game_number:
+        title = '%s %s: %s vs %s(Playoff) - %s (Game %s)' %(status, time_game, host_team, away_team, playoff_round, game_number)
+    else:
+        title = '%s %s: %s vs %s ' %(status, time_game, host_team, away_team)
 
-    title += '%s %s: %s vs %s ' % (
-                                    status,
-                                    time_game,
-                                    away_team,
-                                    host_team
-                                 )
     return(title)
