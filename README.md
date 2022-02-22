@@ -13,5 +13,6 @@
  - Browsing videos by team/player
  - Search across the NBA videos database
 
-## To-Do
- - Add possibility to chose within the settings to automatically go live/start from the beginning for live games
+# By me a cofee
+If you want to donate you can do it using this link down here
+https://www.paypal.com/donate/?hosted_button_id=NB4C25J6ED3ZE
