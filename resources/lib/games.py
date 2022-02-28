@@ -273,7 +273,7 @@ def BROWSE_DAYS(plugin, month, year, cal=False, **kwargs):
 
 
 @Route.register(content_type="videos")
-def BROWSE_GAMES(plugin, DATE=None, games=None):
+def BROWSE_GAMES(plugin, DATE=None, games=None, cache_max_age=0):
     if not DATE:
         DATE = nowWEST()
     headers = {'User-Agent': USER_AGENT}
@@ -291,7 +291,7 @@ def BROWSE_GAMES(plugin, DATE=None, games=None):
         resp = urlquick.get(
                                 todays_game_url,
                                 headers=headers,
-                                max_age=0
+                                max_age=cache_max_age
                             ).text.replace('var g_schedule=','')
         games = json.loads(resp)
     liz = None
