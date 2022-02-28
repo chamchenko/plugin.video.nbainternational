@@ -160,7 +160,8 @@ def BROWSE_GAMES_MENU(plugin):
     FAVORITE_TEAMS = get_profile_info()['FAVORITE_TEAMS']
     yield Listitem.from_dict(
                                 BROWSE_GAMES,
-                                bold('Live Games')
+                                bold('Live Games'),
+                                params = {'DATE': nowWEST()}
                             )
     if EN_CAL:
         yield Listitem.from_dict(
