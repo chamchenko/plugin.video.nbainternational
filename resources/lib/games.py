@@ -267,7 +267,7 @@ def BROWSE_DAYS(plugin, month, year, cal=False, **kwargs):
             yield Listitem.from_dict(
                                         BROWSE_GAMES,
                                         bold(title),
-                                        params = {'DATE': day}
+                                        params = {'DATE': day, 'cache_max_age': 60 * 60}
                                     )
 
 
@@ -322,26 +322,26 @@ def BROWSE_MONTHS(plugin, year=None, team=None, cal=False):
             yield Listitem.from_dict(
                                         BROWSE_GAMES,
                                         bold('Last Night'),
-                                        params = {'DATE': day}
+                                        params = {'DATE': day, 'cache_max_age': 60 * 60}
                                     )
             day = DATE + datetime.timedelta(days=-2)
             yield Listitem.from_dict(
                                         BROWSE_GAMES,
                                         bold('Two Nights Ago'),
-                                        params = {'DATE': day}
+                                        params = {'DATE': day, 'cache_max_age': 60 * 60}
                                     )
         if cal:
             day = DATE + datetime.timedelta(days=+1)
             yield Listitem.from_dict(
                                         BROWSE_GAMES,
                                         bold('Tomorrow'),
-                                        params = {'DATE': day}
+                                        params = {'DATE': day, 'cache_max_age': 60 * 60}
                                     )
             day = DATE + datetime.timedelta(days=+2)
             yield Listitem.from_dict(
                                         BROWSE_GAMES,
                                         bold('In Two days'),
-                                        params = {'DATE': day}
+                                        params = {'DATE': day, 'cache_max_age': 60 * 60}
                                     )
             start_month = month
             month = 12
