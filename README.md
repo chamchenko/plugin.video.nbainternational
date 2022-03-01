@@ -13,6 +13,6 @@
  - Browsing videos by team/player
  - Search across the NBA videos database
 
-# By me a cofee
+# Buy me a coffee
 If you want to donate you can do it using this link down here
 https://www.paypal.com/donate/?hosted_button_id=NB4C25J6ED3ZE
