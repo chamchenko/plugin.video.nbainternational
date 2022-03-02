@@ -72,7 +72,7 @@ def BROWSE_COLLECTIONS(plugin, content_type="episodes"):
                                 max_age=86400
                               ).json()['results']['carousels']
     for collection in collections:
-        if collection['type'] == "video_carousel":
+        if collection['type'] == "video_carousel" and 'slug' in collection['value']:
             title = collection['title']
             slug = collection['value']['slug']
             liz = Listitem()
@@ -87,6 +87,8 @@ def BROWSE_COLLECTIONS(plugin, content_type="episodes"):
         else:
             if collection['title'] == "NBA TV SHOWS":
                 continue
+            if 'items' not in collection['value']:
+                    continue
             for sub_collection in collection['value']['items']:
                 title = sub_collection['name']
                 slug = sub_collection['slug']
