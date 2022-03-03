@@ -115,31 +115,33 @@ def get_token():
         access_token = None
         Script.log('get_token: Unable to get access token from cache', lvl=Script.DEBUG)
     if access_token:
-        exp = json.loads(b64decode(access_token.split('.')[1]))['exp']
-        now = time()
-        # renew if under 5 minutes to expire
-        if (exp > now) and (exp - now < 300):
-            try:
-                Script.log('get_token: Trying to renew token', lvl=Script.DEBUG)
-                headers['CIAM_TOKEN'] = access_token
-                auth_data = urlquick.get(
-                                            RENEW_TOKEN_URL,
-                                            headers=headers,
-                                            data=auth_payload,
-                                            max_age=0
-                                        ).json()
-            except:
-                Script.log('get_token: Could not renew token will try to get new one', lvl=Script.DEBUG)
+        try:
+            exp = json.loads(b64decode(access_token.split('.')[1]))['exp']
+            now = time()
+            # renew if under 5 minutes to expire
+            if (exp > now) and (exp - now < 300):
+                try:
+                    Script.log('get_token: Trying to renew token', lvl=Script.DEBUG)
+                    headers['CIAM_TOKEN'] = access_token
+                    auth_data = urlquick.get(
+                                                RENEW_TOKEN_URL,
+                                                headers=headers,
+                                                data=auth_payload,
+                                                max_age=0
+                                            ).json()
+                except:
+                    Script.log('get_token: Could not renew token will try to get new one', lvl=Script.DEBUG)
+                    auth_data = None
+                    access_token = None
+            #if expired force renew
+            if exp < now:
+                Script.log('get_token: Cache token expired', lvl=Script.DEBUG)
                 auth_data = None
                 access_token = None
-        #if expired force renew
-        if exp < now:
-            Script.log('get_token: Cache token expired', lvl=Script.DEBUG)
-            auth_data = None
+            else:
+                return access_token
+        except:
             access_token = None
-        else:
-            return access_token
-
 
     if not access_token:
         CIAM_TOKEN = get_cookies()
@@ -303,5 +305,4 @@ def get_device_ids():
         profileinfo.flush()
         Script.log('get_device_ids: stored device ids to cache', lvl=Script.DEBUG)
         return {'PCID': profileinfo['PCID'], 'DEVICEID': profileinfo['DEVICEID']}
-
 
