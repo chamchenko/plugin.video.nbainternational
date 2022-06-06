@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.nbainternational" version="0.0.1~beta19" name="NBA International" provider-name="CHAMCHENKO">
+<addon id="plugin.video.nbainternational" version="0.0.1~beta20" name="NBA International" provider-name="CHAMCHENKO">
     <requires>
         <import addon="script.module.codequick" version="0.9.13"/>
         <import addon="script.module.future" version="0.17.1"/>
