@@ -59,6 +59,4 @@ def NBA_TV(plugin):
                 liz.property['inputstream.adaptive.license_type'] = DRM
                 license_key = '%s|authorization=bearer %s|R{SSM}|' % (LICENSE_URL, drm)
                 liz.property['inputstream.adaptive.license_key'] = license_key
-                liz.property['ResumeTime'] = '120'
-                liz.property['TotalTime'] = '14400'
     yield liz
