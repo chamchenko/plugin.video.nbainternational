@@ -11,23 +11,26 @@ import calendar
 import xbmcgui
 import os
 import re
+import uuid
 
 from resources.lib.vars import *
 from resources.lib.tools import *
 from resources.lib.auth import get_headers
 from resources.lib.auth import get_profile_info
 from resources.lib.auth import get_device_ids
+from resources.lib.auth import get_token
 from codequick import Route
 from codequick import Listitem
 from codequick import Resolver
 from codequick.utils import bold
 from inputstreamhelper import Helper
+from base64 import b64encode
 
 
 
 
 
-def process_games(game, teams_info):
+def process_games(game, teams_info, cache_max_age):
         gameID = game['id']
         gameCode = game['seoName']
         game_time = game['st']
@@ -149,7 +152,8 @@ def process_games(game, teams_info):
                             start_time=game_timestamp,
                             end_time=game_end_timestamp,
                             game_state=game_state,
-                            feeds=feeds
+                            feeds=feeds,
+                            cache_max_age=cache_max_age
                         )
         return liz
 
@@ -300,7 +304,7 @@ def BROWSE_GAMES(plugin, DATE=None, games=None, cache_max_age=0):
         if 'game' in game:
             if not game['game']:
                 continue
-        liz = process_games(game, teams_info)
+        liz = process_games(game, teams_info, cache_max_age)
         yield liz
 
     if not liz:
@@ -350,7 +354,7 @@ def BROWSE_MONTHS(plugin, year=None, team=None, cal=False):
     else:
         this_year = False
         month = 12
-    headers = get_headers(True)
+    headers = None #get_headers(True)
     if not headers:
         yield False
         return
@@ -437,7 +441,7 @@ def BROWSE_MONTH(plugin, year, month, team, **kwargs):
     for game in games:
         if game != []:
             game = game[0]
-            liz = process_games(game,teams_info)
+            liz = process_games(game,teams_info, 0)
             yield liz
 
 
@@ -458,7 +462,26 @@ def BROWSE_YEARS(plugin, year, team=False):
 
 
 @Route.register(content_type="videos")
-def BROWSE_GAME(plugin, gameID, start_time, end_time, game_state, feeds):
+def BROWSE_GAME(plugin, gameID, start_time, end_time, game_state, feeds, cache_max_age):
+    headers = get_headers()
+    play_options = urlquick.get(
+                                PLAY_OPTIONS_URL % gameID,
+                                headers=headers,
+                                max_age=cache_max_age
+                            ).json()
+    for play_option in play_options['Vods']:
+        yield Listitem.from_dict(
+                                PLAY_GAME,
+                                bold(play_option['DisplayName'][0]['Value']),
+                                params = {
+                                    'gameID': gameID,
+                                    'videoProfileId': play_option['PlayActions'][0]['VideoProfile']['Id']
+                                }
+                            )
+
+
+
+def _BROWSE_GAME(plugin, gameID):
     for feed in feeds:
         feed['gameID'] = gameID
         feed['start_time'] = start_time
@@ -473,7 +496,49 @@ def BROWSE_GAME(plugin, gameID, start_time, end_time, game_state, feeds):
 
 
 @Resolver.register
-def PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd):
+def PLAY_GAME(plugin, gameID, videoProfileId):
+    access_token = get_token()
+    deviceinfos = get_device_ids()
+    headers = {
+        'content-type': 'text/plain;charset=UTF-8',
+        'authorizationtoken': access_token,
+        'azukiimc': 'IMC7.1.0_AN_D3.0.0_S0',
+        'deviceprofile': b64encode(('{"osVersion":"10","vendorName":"Microsoft","osName":"HTML5","deviceUUID":"%s"}' % deviceinfos['DEVICEID']).encode('ascii'))
+    } 
+    sessionId = uuid.uuid1()
+    play_options = urlquick.post(
+                            PLAY_ROLL_URL % (videoProfileId, sessionId),
+                            headers=headers,
+                            data=b'{}',
+                            max_age=0,
+                            raise_for_status=False
+                        ).json()['response']
+    
+    url = '%s/%s' % (play_options['cdns']['cdn'][0]['base_uri'], play_options['manifest_uri'])
+    protocol = play_options['package_type']
+    license_url = WIDEVINE_LICENSE_URL % (videoProfileId, sessionId)
+    
+    liz = Listitem()
+    liz.path = url
+    #liz.label = name
+    liz.property[INPUTSTREAM_PROP] = 'inputstream.adaptive'
+    
+    is_helper = Helper(protocol, drm=DRM)
+    if is_helper.check_inputstream():
+        liz.property['inputstream.adaptive.manifest_type'] = protocol
+        liz.property['inputstream.adaptive.license_type'] = DRM
+        license_key = '%s|AuthorizationToken=%s|R{SSM}|' % (license_url, access_token)
+        liz.property['inputstream.adaptive.license_key'] = license_key
+        liz.property['inputstream.adaptive.manifest_update_parameter'] = 'full'
+        liz.property['inputstream.adaptive.play_timeshift_buffer'] = 'true'
+    
+        yield liz
+
+    yield False
+    return
+
+
+def _PLAY_GAME(plugin, gameID, start_time, end_time, game_state, name, gt, cn, rd):
     plugin.log('PLAY_GAME start_time: %s' % start_time, lvl=plugin.DEBUG)
     plugin.log('PLAY_GAME end_time: %s' % end_time, lvl=plugin.DEBUG)
     headers = get_headers()
