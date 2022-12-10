@@ -176,7 +176,7 @@ def get_token():
     tokeninfo['expiry_time'] = auth_data['data']['ExpiryTime']
     tokeninfo.flush()
     Script.log('get_token: stored access token to cache', lvl=Script.DEBUG)
-    login_headers.update({'authorization': 'Bearer %s' % access_token})
+    login_headers.update({'authorization': 'Bearer %s' % CIAM_TOKEN})
     params = {'associations': 'false'}
     Script.log('get_token: getting subscrition infos', lvl=Script.DEBUG)
     subscrition_data = urlquick.get(
