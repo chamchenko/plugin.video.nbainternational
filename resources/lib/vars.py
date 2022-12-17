@@ -39,15 +39,19 @@ IDENTIFY = 'https://identity.nba.com/api/v1/'
 PROFILE_URL = IDENTIFY + 'profile'
 LOGIN_URL = IDENTIFY + 'auth'
 TOKEN_URL = IDENTIFY + 'oauth/token'
+AUTH_URL = IDENTIFY + 'sts'
+SUBSCRIPTION_URL = IDENTIFY + 'profile?entitlements=true'
 
 WATCH = 'https://watch.nba.com/'
-AUTH_URL = WATCH + 'secure/authenticate'
 GAME_DATA_ENDPOINT = WATCH + 'game/%s?format=json'
 CONFIG_ENDPOINT = WATCH + 'service/config?format=json&cameras=true'
 FREE_TOKEN_URL = WATCH + 'secure/accesstoken'
 
+PLAY_OPTIONS_URL = 'https://ottapp-appgw-client.nba.com/S1/subscriber/v1/events/%s/play-options?IsexternalId=true'
+PLAY_ROLL_URL = 'https://ottapp-appgw-amp.nba.com/v1/client/roll?ownerUid=azuki&mediaId=%s&sessionId=%s'
+WIDEVINE_LICENSE_URL = 'https://ottapp-appgw-amp.nba.com/v1/client/get-widevine-license?ownerUid=azuki&mediaId=%s&sessionId=%s'
+
 NBAAPI = 'https://nbaapi.neulion.com/api_nba/v1/'
-SUBSCRIPTION_URL = NBAAPI + 'account/subscriptions'
 RENEW_TOKEN_URL = NBAAPI + 'accesstoken'
 PUBLISH_ENDPOINT = NBAAPI + 'publishpoint'
 GAME_URL = NBAAPI + 'game'
@@ -92,4 +96,3 @@ PROTOCOLS = {
     'hls': {'extensions': ['m3u8', 'm3u'], 'mimetype': 'application/vnd.apple.mpegurl'},
 }
 DRM = 'com.widevine.alpha'
-LICENSE_URL = 'https://shield-twoproxy.imggaming.com/proxy'
