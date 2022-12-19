@@ -6,12 +6,13 @@
 
 import json
 import urlquick
+import time
+import urllib.parse
 
 from resources.lib.vars import *
 from codequick.storage import PersistentDict
 from codequick import Script
 from base64 import b64decode
-from time import time
 from random import choice
 
 
@@ -100,7 +101,7 @@ def get_cookies():
     logindata['refreshToken'] = refreshToken
     logindata.flush()
     Script.log('get_cookies: stored cookies to cache', lvl=Script.DEBUG)
-    return CIAM_TOKEN
+    return CIAM_TOKEN, refreshToken
 
 
 
@@ -110,14 +111,19 @@ def get_token():
     tokeninfo = PersistentDict(".accountinfo.token", ttl=7198)
     try:
         access_token = tokeninfo['access_token']
+        expiry_time = None #tokeninfo['expiry_time']
         Script.log('get_token: Got access token from cache', lvl=Script.DEBUG)
     except:
         access_token = None
+        expiry_time = None
         Script.log('get_token: Unable to get access token from cache', lvl=Script.DEBUG)
-    if access_token:
+    if expiry_time:
         try:
-            exp = json.loads(b64decode(access_token.split('.')[1]))['exp']
-            now = time()
+            # b64 = access_token.split('.')[1]
+            # token_json = b64decode(b64 + '=' * (-len(b64) % 4)).decode('utf-8')
+            # exp = json.loads(token_json)['exp']
+            exp = time.mktime(time.strptime(expiry_time[:26], '%Y-%m-%dT%H:%M:%S.%f'))
+            now = time.time()
             # renew if under 5 minutes to expire
             if (exp > now) and (exp - now < 300):
                 try:
@@ -138,38 +144,47 @@ def get_token():
                 Script.log('get_token: Cache token expired', lvl=Script.DEBUG)
                 auth_data = None
                 access_token = None
+                expiry_time = None
             else:
                 return access_token
-        except:
+        except Exception as exp:
+            Script.log(exp, lvl=Script.ERROR)
             access_token = None
 
-    if not access_token:
-        CIAM_TOKEN = get_cookies()
+    if not access_token or not expiry_time:
+        CIAM_TOKEN, refreshToken = get_cookies()
         if not CIAM_TOKEN:
             return False
-        headers['CIAM_TOKEN'] = CIAM_TOKEN
+        #headers['CIAM_TOKEN'] = CIAM_TOKEN
         Script.log('get_token: trying to get new token', lvl=Script.DEBUG)
-        auth_data = urlquick.post(
+        auth_data = urlquick.get(
                                     AUTH_URL,
                                     headers=headers,
-                                    data=auth_payload,
+                                    cookies={
+                                        'nbaidentity': '{"jwt":"%s","refreshToken":"%s"}' % (CIAM_TOKEN, refreshToken)
+                                    },
                                     max_age=0
                                 ).json()
-    login_status = auth_data['code']
+    
+    login_status = auth_data['status']
     Script.log('get_cookies: Login status %s' % login_status, lvl=Script.DEBUG)
-    access_token = auth_data['data']['accessToken']
+    if not 'success' in login_status:
+        return False
+        
+    access_token = auth_data['data']['AccessToken']
     tokeninfo['access_token'] = access_token
+    tokeninfo['expiry_time'] = auth_data['data']['ExpiryTime']
     tokeninfo.flush()
     Script.log('get_token: stored access token to cache', lvl=Script.DEBUG)
-    login_headers.update({'authorization': 'Bearer %s' % access_token})
+    login_headers.update({'authorization': 'Bearer %s' % CIAM_TOKEN})
     params = {'associations': 'false'}
     Script.log('get_token: getting subscrition infos', lvl=Script.DEBUG)
-    subscrition_data = urlquick.post(
+    subscrition_data = urlquick.get(
                                         SUBSCRIPTION_URL,
                                         headers=login_headers,
                                         max_age=86400
                                     ).json()
-    if 'subs' in subscrition_data:
+    if 'subscriptions' in subscrition_data['data']:
         Script.log('get_token: found subscrition infos', lvl=Script.DEBUG)
         """ 
         subscrition_type = subscrition_data['subs'][0]['productSubType']
@@ -225,8 +240,8 @@ def get_headers(free=False):
     if access_token:
         headers = {
                     'User-Agent': USER_AGENT,
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'authorization': 'Bearer %s' % access_token
+                    'Content-Type': 'application/json',
+                    'Authorization': 'OAUTH2 access_token="%s"' % access_token
                   }
     else:
         headers = None
