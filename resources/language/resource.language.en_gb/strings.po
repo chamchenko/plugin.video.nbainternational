@@ -57,8 +57,8 @@ msgctxt "#30014"
 msgid "Show Upcoming"
 msgstr ""
 
-msgctxt "#30015"
-msgid "Live Play Action"
+msgctxt "#30016"
+msgid "Hide Scores"
 msgstr ""
 
 # msgs
