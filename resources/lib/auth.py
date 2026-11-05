@@ -249,62 +249,6 @@ def get_headers(free=False):
 
 
 
-def get_profile_info():
-    profileinfo = PersistentDict(".accountinfo.profileinfo", ttl=7776000)
-    try:
-        FAVORITE_TEAMS = profileinfo['fav_team']
-        FAVORITE_PLAYERS = profileinfo['fav_players']
-        Script.log('get_profile_info: Got profile info from cache', lvl=Script.DEBUG)
-    except:
-        Script.log(
-                    'get_profile_info: Favorite team or Favorite players unset',
-                    lvl=Script.DEBUG
-                  )
-        FAVORITE_TEAMS = None
-        FAVORITE_PLAYERS = None
-    if not FAVORITE_TEAMS or not FAVORITE_PLAYERS:
-        access_token = get_cookies()
-        if not access_token:
-            return {'FAVORITE_TEAMS': None, 'FAVORITE_PLAYERS': None}
-        headers = {
-                    'User-Agent': USER_AGENT,
-                    'authorization': 'Bearer %s' % access_token
-                  }
-        Script.log('get_profile_info: Getting profile info', lvl=Script.DEBUG)
-        profile_data = urlquick.get(
-                                        PROFILE_URL,
-                                        headers=headers,
-                                        max_age=2592000
-                                   ).json()
-        #select the first team only
-        FAVORITE_TEAMS = []
-        for team in profile_data['data']['result']['favoriteTeams']:
-            FAVORITE_TEAMS.append(team['teamTriCode'])
-        FAVORITE_PLAYERS = []
-        for player in profile_data['data']['result']['favoritePlayers']:
-            FAVORITE_PLAYERS.append({'name': player['playerName'], 'player_id': player['playerId']})
-        profileinfo['fav_team'] = FAVORITE_TEAMS
-        profileinfo['fav_players'] = FAVORITE_PLAYERS
-        profileinfo.flush()
-        if not FAVORITE_PLAYERS and not DIS_MSGS:
-            Script.notify(
-                            Script.localize(30208),
-                            Script.localize(30205),
-                            display_time=5000,
-                            sound=True
-                         )
-        if not FAVORITE_TEAMS and not DIS_MSGS:
-            Script.notify(
-                            Script.localize(30208),
-                            Script.localize(30206),
-                            display_time=5000,
-                            sound=True
-                         )
-        Script.log('get_profile_info: stored profile info to cache', lvl=Script.DEBUG)
-    return {'FAVORITE_TEAMS': FAVORITE_TEAMS, 'FAVORITE_PLAYERS': FAVORITE_PLAYERS}
-
-
-
 def get_device_ids():
     profileinfo = PersistentDict(".accountinfo.profileinfo", ttl=7776000)
     try:

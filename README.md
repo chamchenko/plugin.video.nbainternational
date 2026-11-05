@@ -1,6 +1,6 @@
 # NBA International League Pass Kodi Plugin
 
-- Live NBA Games, NBA TV, Archived Games, Video Collections and More
+- Live NBA Games, NBA TV, Archived Games and Classic Games
 - Requires an Active NBA International League Pass Subscription
 
 ## Install tips
@@ -9,9 +9,8 @@
 
 ## What Works
  - Live NBA TV
- - Video Collections and NBA TV Series
- - Browsing videos by team/player
- - Search across the NBA videos database
+ - Archived games (with optional score hiding in settings)
+ - Classic games by team (from the NBA TV page)
 
 # Buy me a coffee
 If you want to donate you can do it using this link down here

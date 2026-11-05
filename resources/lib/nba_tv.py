@@ -9,8 +9,7 @@ import urlquick
 
 from resources.lib.vars import *
 from resources.lib.tools import urlencode
-from resources.lib.auth import get_headers
-from resources.lib.auth import get_device_ids
+from resources.lib.games import resolve_stream
 from codequick import Route
 from codequick import Listitem
 from codequick import Resolver
@@ -22,41 +21,7 @@ from inputstreamhelper import Helper
 
 @Resolver.register
 def NBA_TV(plugin):
-    headers = get_headers()
-    if not headers:
-        yield None
-        return
-    deviceinfos = get_device_ids()
-    DEVICEID = deviceinfos['PCID']
-    PCID = deviceinfos['PCID']
-    payload_data = {
-                        'type': 'channel',
-                        'id': 1,
-                        'drmtoken': True,
-                        'deviceid': DEVICEID,
-                        'pcid': PCID,
-                        'format': 'json'
-                   }
-    plugin.log('Fetching url: %s' % PUBLISH_ENDPOINT, lvl=plugin.DEBUG)
-    plugin.log('Fetching data: %s' % payload_data, lvl=plugin.DEBUG)
-    Response = urlquick.post(
-                                PUBLISH_ENDPOINT,
-                                data=payload_data,
-                                headers=headers
-                           ).json()
-    url = Response['path']
-    drm = Response['drmToken']
-    liz = Listitem()
-    liz.path = url
-    liz.label = 'NBA TV'
-    liz.property[INPUTSTREAM_PROP] ='inputstream.adaptive'
-    
-    for protocol, protocol_info in PROTOCOLS.items():
-        if any(".%s" % extension in url for extension in protocol_info['extensions']):
-            is_helper = Helper(protocol, drm=DRM)
-            if is_helper.check_inputstream():
-                liz.property['inputstream.adaptive.manifest_type'] = protocol
-                liz.property['inputstream.adaptive.license_type'] = DRM
-                license_key = '%s|authorization=bearer %s|R{SSM}|' % (LICENSE_URL, drm)
-                liz.property['inputstream.adaptive.license_key'] = license_key
+    liz = resolve_stream(plugin, 'NBATVD', '1023', rights_mode=2)
+    if liz:
+        liz.label = 'NBA TV'
     yield liz

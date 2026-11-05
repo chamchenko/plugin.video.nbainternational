@@ -12,12 +12,9 @@ from codequick import Listitem
 from codequick.utils import bold
 from resources.lib.tools import *
 from resources.lib.vars import *
-from resources.lib.auth import get_profile_info
 from resources.lib.nba_tv import NBA_TV
 from resources.lib.games import BROWSE_GAMES_MENU
-from resources.lib.series import BROWSE_SERIES
-from resources.lib.videos import BROWSE_COLLECTIONS
-from resources.lib.videos import VIDEO_SUB_MENU
+from resources.lib.classics import CLASSICS_MENU
 
 
 
@@ -26,7 +23,6 @@ from resources.lib.videos import VIDEO_SUB_MENU
 @Route.register(content_type="videos")
 def root(plugin):
     plugin.log('Creating Main Menu', lvl=plugin.WARNING)
-    profileinfo = get_profile_info()
     yield Listitem.from_dict(
                                 NBA_TV,
                                 bold('NBA TV')
@@ -36,14 +32,6 @@ def root(plugin):
                                 bold('Games')
                             )
     yield Listitem.from_dict(
-                                BROWSE_SERIES,
-                                bold('Series')
-                            )
-    yield Listitem.from_dict(
-                                BROWSE_COLLECTIONS,
-                                bold('Video Collections')
-                            )
-    yield Listitem.from_dict(
-                                VIDEO_SUB_MENU,
-                                bold('Videos')
+                                CLASSICS_MENU,
+                                bold('Classic Games')
                             )
